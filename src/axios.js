@@ -9,29 +9,29 @@ const infoDump = document.getElementById("infoDump");
 async function initialLoad() {
   try {
 
-    const breeds = await getBreeds_AXIOS();
+    const breeds = await getBreeds_AXIOS()
 
-    breedSelect.innerHTML = "";
+    breedSelect.innerHTML = ""
     for (const b of breeds) {
       if(!b?.id) continue
 
       breedsById[b.id] = b
 
-      const opt = document.createElement("option");
-      opt.value = b.id;
-      opt.textContent = b.name;
-      breedSelect.appendChild(opt);
+      const opt = document.createElement("option")
+      opt.value = b.id
+      opt.textContent = b.name
+      breedSelect.appendChild(opt)
     }
     console.log(breedsById)
     // Step 2: create initial carousel at end of initialLoad
     if (breedSelect.value) {
-      await handleBreedChange(breedSelect.value);
+      await handleBreedChange(breedSelect.value)
     }
   } catch (err) {
-    console.error("initialLoad error:", err);
-    breedSelect.innerHTML = `<option value="">Failed to load breeds</option>`;
-    clearInfo();
-    infoDump.textContent = `Failed to load breeds. ${err.message}`;
+    console.error("initialLoad error:", err)
+    breedSelect.innerHTML = `<option value="">Failed to load breeds</option>`
+    clearInfo()
+    infoDump.textContent = `Failed to load breeds. ${err.message}`
   }
 }
 
@@ -87,7 +87,7 @@ breedSelect.addEventListener("change", async (e) => {
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
 
-const API_KEY = import.meta.env.VITE_API_KEY;
+const API_KEY = import.meta.env.VITE_API_KEY
 
 const breedsById = {}
 
@@ -102,6 +102,8 @@ function renderInfo(breed) {
     infoDump.textContent = "No breed info available."
     return
   }
+
+  /* Nullish coalescing operator / what is used is saying either one or the other. if the first value is nullish/falsy, the other value is used. almost like (obj?.name || "Luis" ) */
 
   const title = document.createElement("h2")
   title.textContent = breed.name ?? "Unknown Breed"
@@ -131,8 +133,8 @@ function resetCarousel(images) {
 }
 
 // Step 4: Axios defaults
-  axios.defaults.baseURL = "https://api.thecatapi.com/v1";
-  axios.defaults.headers.common["x-api-key"] = API_KEY;
+  axios.defaults.baseURL = "https://api.thecatapi.com/v1"
+  axios.defaults.headers.common["x-api-key"] = API_KEY
 
   // Step 5: Axios interceptors
   axios.interceptors.request.use((config) => {
@@ -143,14 +145,14 @@ function resetCarousel(images) {
 
   axios.interceptors.response.use(
     (res) => {
-      const start = res.config?.metadata?.start ?? performance.now();
-      const ms = Math.round(performance.now() - start);
-      console.log(`Response received in ${ms}ms`);
-      return res;
+      const start = res.config?.metadata?.start ?? performance.now()
+      const ms = Math.round(performance.now() - start)
+      console.log(`Response received in ${ms}ms`)
+      return res
     },
     (err) => {
-      console.error("Request failed:", err);
-      return Promise.reject(err);
+      console.error("Request failed:", err)
+      return Promise.reject(err)
     }
   )
 

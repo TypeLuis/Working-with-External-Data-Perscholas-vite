@@ -27,7 +27,7 @@ const breedsById = {}
 
 async function initialLoad() {
   try {
-    const breeds = await getBreeds_FETCH();
+    const breeds = await getBreeds_FETCH()
 
     breedSelect.innerHTML = "";
     for (const b of breeds) {
@@ -35,20 +35,20 @@ async function initialLoad() {
 
       breedsById[b.id] = b
 
-      const opt = document.createElement("option");
-      opt.value = b.id;
-      opt.textContent = b.name;
-      breedSelect.appendChild(opt);
+      const opt = document.createElement("option")
+      opt.value = b.id
+      opt.textContent = b.name
+      breedSelect.appendChild(opt)
     }
 
     if (breedSelect.value) {
-      await handleBreedChange(breedSelect.value);
+      await handleBreedChange(breedSelect.value)
     }
   } catch (err) {
-    console.error("initialLoad error:", err);
-    breedSelect.innerHTML = `<option value="">Failed to load breeds</option>`;
-    clearInfo();
-    infoDump.textContent = `Failed to load breeds. ${err.message}`;
+    console.error("initialLoad error:", err)
+    breedSelect.innerHTML = `<option value="">Failed to load breeds</option>`
+    clearInfo()
+    infoDump.textContent = `Failed to load breeds. ${err.message}`
   }
 }
 
@@ -57,7 +57,7 @@ async function getBreeds_FETCH() {
     headers: { "x-api-key": API_KEY }
   });
   if (!res.ok) throw new Error(`Breeds request failed: ${res.status}`);
-  return res.json();
+  return res.json()
 }
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -181,34 +181,34 @@ export async function favourite(imgId) {
 
 
 function clearInfo() {
-  infoDump.innerHTML = "";
+  infoDump.innerHTML = ""
 }
 
 function renderInfo(breed) {
-  clearInfo();
+  clearInfo()
 
   if (!breed) {
-    infoDump.textContent = "No breed info available.";
-    return;
+    infoDump.textContent = "No breed info available."
+    return
   }
 
-  const title = document.createElement("h2");
-  title.textContent = breed.name ?? "Unknown Breed";
+  const title = document.createElement("h2")
+  title.textContent = breed.name ?? "Unknown Breed"
 
-  const origin = document.createElement("p");
-  origin.innerHTML = `<strong>Origin:</strong> ${breed.origin ?? "N/A"}`;
+  const origin = document.createElement("p")
+  origin.innerHTML = `<strong>Origin:</strong> ${breed.origin ?? "N/A"}`
 
-  const temperament = document.createElement("p");
-  temperament.innerHTML = `<strong>Temperament:</strong> ${breed.temperament ?? "N/A"}`;
+  const temperament = document.createElement("p")
+  temperament.innerHTML = `<strong>Temperament:</strong> ${breed.temperament ?? "N/A"}`
 
-  const desc = document.createElement("p");
-  desc.textContent = breed.description ?? "No description available.";
+  const desc = document.createElement("p")
+  desc.textContent = breed.description ?? "No description available."
 
-  infoDump.append(title, origin, temperament, desc);
+  infoDump.append(title, origin, temperament, desc)
 }
 
 function resetCarousel(images) {
-  Carousel.clear();
+  Carousel.clear()
 
   for (const img of images) {
     const alt = img?.breeds?.[0]?.name ?? "Cat"
@@ -216,7 +216,7 @@ function resetCarousel(images) {
     Carousel.appendCarousel(item)
   }
 
-  Carousel.start();
+  Carousel.start()
 }
 
 
