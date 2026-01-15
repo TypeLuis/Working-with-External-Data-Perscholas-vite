@@ -23,6 +23,42 @@ console.log(API_KEY);
  * This function should execute immediately.
  */
 
+const breedsById = {}
+
+async function initialLoad() {
+  try {
+    const breeds = await getBreeds_FETCH();
+
+    breedSelect.innerHTML = "";
+    for (const b of breeds) {
+      if(!b?.id) continue
+
+      breedsById[b.id] = b
+
+      const opt = document.createElement("option");
+      opt.value = b.id;
+      opt.textContent = b.name;
+      breedSelect.appendChild(opt);
+    }
+
+    if (breedSelect.value) {
+      await handleBreedChange(breedSelect.value);
+    }
+  } catch (err) {
+    console.error("initialLoad error:", err);
+    breedSelect.innerHTML = `<option value="">Failed to load breeds</option>`;
+    clearInfo();
+    infoDump.textContent = `Failed to load breeds. ${err.message}`;
+  }
+}
+
+async function getBreeds_FETCH() {
+  const res = await fetch("https://api.thecatapi.com/v1/breeds", {
+    headers: { "x-api-key": API_KEY }
+  });
+  if (!res.ok) throw new Error(`Breeds request failed: ${res.status}`);
+  return res.json();
+}
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
@@ -37,6 +73,38 @@ console.log(API_KEY);
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+
+async function handleBreedChange(breedId) {
+  const images = await getBreedImages_FETCH(breedId)
+
+  if (!Array.isArray(images) || images.length === 0) {
+    Carousel.clear()
+  } else {
+    resetCarousel(images)
+  }
+  renderInfo(breedsById[breedId])
+}
+
+async function getBreedImages_FETCH(breedId) {
+  const url = new URL("https://api.thecatapi.com/v1/images/search")
+  url.searchParams.set("breed_ids", breedId)
+  url.searchParams.set("limit", "10")
+
+  const res = await fetch(url.toString(), {
+    headers: { "x-api-key": API_KEY }
+  })
+  if (!res.ok) throw new Error(`Images request failed: ${res.status}`)
+  return res.json()
+}
+
+breedSelect.addEventListener("change", async (e) => {
+  try {
+    await handleBreedChange(e.target.value)
+  } catch (err) {
+    console.error("breedSelect change error:", err)
+  }
+})
+
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
@@ -110,3 +178,46 @@ export async function favourite(imgId) {
  * - Test other breeds as well. Not every breed has the same data available, so
  *   your code should account for this.
  */
+
+
+function clearInfo() {
+  infoDump.innerHTML = "";
+}
+
+function renderInfo(breed) {
+  clearInfo();
+
+  if (!breed) {
+    infoDump.textContent = "No breed info available.";
+    return;
+  }
+
+  const title = document.createElement("h2");
+  title.textContent = breed.name ?? "Unknown Breed";
+
+  const origin = document.createElement("p");
+  origin.innerHTML = `<strong>Origin:</strong> ${breed.origin ?? "N/A"}`;
+
+  const temperament = document.createElement("p");
+  temperament.innerHTML = `<strong>Temperament:</strong> ${breed.temperament ?? "N/A"}`;
+
+  const desc = document.createElement("p");
+  desc.textContent = breed.description ?? "No description available.";
+
+  infoDump.append(title, origin, temperament, desc);
+}
+
+function resetCarousel(images) {
+  Carousel.clear();
+
+  for (const img of images) {
+    const alt = img?.breeds?.[0]?.name ?? "Cat"
+    const item = Carousel.createCarouselItem(img.url, alt, img.id)
+    Carousel.appendCarousel(item)
+  }
+
+  Carousel.start();
+}
+
+
+initialLoad()
